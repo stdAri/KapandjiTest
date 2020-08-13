@@ -2,6 +2,8 @@ from RPi import GPIO
 import time
 import numpy as np
 
+SAVEFILE = 1
+
 # raspi GPIO config 
 def Gpio_config(sensor, switch, sensor_bounce_time, switch_bounce_time):
     # ²ÉÓÃBCMÒý½Å±àºÅ
@@ -17,6 +19,11 @@ def Gpio_config(sensor, switch, sensor_bounce_time, switch_bounce_time):
     GPIO.add_event_detect(sensor, GPIO.RISING, bouncetime = sensor_bounce_time)
     GPIO.add_event_detect(switch, GPIO.RISING, bouncetime = switch_bounce_time)
 
+def Start_single_test(test_num):
+    test_num = test_num + 1
+    print('Begin singal kapandji test ----', test_num)
+    return test_num
+
 # record test result
 def Record_test_result(result, delta_time, test_num, success_num, result_list):
     print('Finish singal kapandji test ----', test_num)
@@ -30,15 +37,16 @@ def Record_test_result(result, delta_time, test_num, success_num, result_list):
 def Record_all_test_result(test_num, success_num, result_list):
     # get timestamp filename
     filename = time.strftime('data/%Y-%m-%d %H:%M',time.localtime()) + " K-test_Result.txt"
-    result_list.append(sum(result_list)/success_num)
+    result_list.append(round(sum(result_list)/success_num, 5))
 
     # print all result
     print("\n All result: ", result_list)
     print("\n Successful test number: ", success_num)
-    print("\n Successful result mean: ",  result_list[test_num - 1])
+    print("\n Successful result mean: ",  result_list[test_num])
 
     # save all result
-    np.savetxt(filename,np.array(result_list))
+    if (SAVEFILE):
+        np.savetxt(filename,np.array(result_list))
 
     # reset variable
     result_list = []
