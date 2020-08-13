@@ -11,12 +11,12 @@ sensor_bounce_time = 400 # 开关触发时间
 switch_bounce_time = 1000 # 开关触发时间
 
 # K-test
-full_test_num = 3 # 总共需要完成测试的数量
+full_test_num = 10 # 总共需要完成测试的数量
 result_list = [] # 结果队列
 test_num = 0     # 已完成测试数量
 success_num = 0  # 成功数量
 begin_flag = 0  # 开关按下标志
-fail_time = 7
+fail_time = 20 # 失败时间阈值
 SUCCESS = 1
 FAILED = 0
 
@@ -24,6 +24,7 @@ FAILED = 0
 Get_time_stamp = lambda:int(round(time.time() * 1000))
 
 print("*********************  Kapandji TEST BEGIN  *********************")
+print("Full test num: ", full_test_num, "\nFail time: ", fail_time)
 
 # GPIO config
 cfg.Gpio_config(sensor, switch, sensor_bounce_time, switch_bounce_time)
