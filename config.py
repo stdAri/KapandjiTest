@@ -33,10 +33,10 @@ def Record_test_result(result, delta_time, test_num, success_num, result_list):
         success_num = success_num + 1
     return result_list,success_num
 
-# record all test result and save to file 
-def Record_all_test_result(test_num, success_num, result_list):
+# record all test result and save to file  
+def Record_all_test_result(name, number, test_num, success_num, result_list):
     # get timestamp filename
-    filename = time.strftime('data/%Y-%m-%d %H:%M',time.localtime()) + " K-test_Result.txt"
+    filename = time.strftime('data/%Y-%m-%d %H:%M ',time.localtime()) + name + ' test ' + number + ".txt"
     result_list.append(round(sum(result_list)/success_num, 5))
 
     # print all result
