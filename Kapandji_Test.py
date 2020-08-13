@@ -7,7 +7,7 @@ import time
 # GPIO
 sensor = 17 # 指尖传感器
 switch = 18 # 开关
-sensor_bounce_time = 200 # 开关触发时间
+sensor_bounce_time = 400 # 开关触发时间
 switch_bounce_time = 1000 # 开关触发时间
 
 # K-test
@@ -16,6 +16,7 @@ result_list = [] # 结果队列
 test_num = 0     # 已完成测试数量
 success_num = 0  # 成功数量
 begin_flag = 0  # 开关按下标志
+fail_time = 7
 SUCCESS = 1
 FAILED = 0
 
@@ -30,36 +31,37 @@ cfg.Gpio_config(sensor, switch, sensor_bounce_time, switch_bounce_time)
  
 #--------------------------------------------  main
 try:
-    while True:
-        # begin_flag 0时按下开关开始计时
-        if (not begin_flag and GPIO.event_detected(switch)):
-            test_num = test_num + 1
-            print('Begin singal kapandji test ----', test_num)
-            begin_flag = 1
-            t = Get_time_stamp()
-            continue
-        
-        # begin_flag 1 时按下开关表示失败测试并开始下一次测试
-        if (begin_flag and GPIO.event_detected(switch)):
-            result_list, success_num = cfg.Record_test_result(FAILED, 0, test_num, success_num, result_list)
-            begin_flag = 0
-            t = Get_time_stamp()
-            continue
-            
+    while True: #总测试循环
+        key = input()
 
-        # begin_flag 1时按下传感器接触表明完成一次测试
-        if (begin_flag and GPIO.event_detected(sensor)):
-            delta_t = (Get_time_stamp() - t)/1000 #转化为秒
-            result_list, success_num = cfg.Record_test_result(SUCCESS, delta_t, test_num, success_num, result_list)
-            begin_flag = 0
-            continue
+        if (key == "" or key == " "): ##输入回车
+            # 开始一组K-test
+            test_num = cfg.Start_single_test(test_num)
+            t = Get_time_stamp()
+            time.sleep(0.1)     # 100毫秒的延迟，消除干扰
             
+            while True: # 单次测试循环
+                delta_t = (Get_time_stamp() - t ) / 1000
+
+                # 大于fail_time认为失败
+                if (delta_t > fail_time):
+                    result_list, success_num = cfg.Record_test_result(FAILED, 0, test_num, success_num, result_list)
+                    break
+                
+                # fail_time内锡纸接触认为成功
+                if (GPIO.event_detected(sensor)):
+                    if (GPIO.input(sensor) == GPIO.HIGH):
+                        # print(GPIO.input(sensor))
+                        result_list, success_num = cfg.Record_test_result(SUCCESS, delta_t, test_num, success_num, result_list)
+                        break
 
         # 完成所有测试组
         if (not begin_flag and test_num == full_test_num):
             test_num, success_num, result_list = cfg.Record_all_test_result(test_num, success_num, result_list)
             continue
-            
+                
+        if (key == "q"):
+            break
         # 可以在循环中做其他检测
         time.sleep(0.01)     # 10毫秒的检测间隔
 except Exception as e:
