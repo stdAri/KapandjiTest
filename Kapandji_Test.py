@@ -20,6 +20,9 @@ fail_time = 20 # 失败时间阈值
 SUCCESS = 1
 FAILED = 0
 
+# 测试者姓
+name = "zhang"
+
 # 毫秒级时间戳
 Get_time_stamp = lambda:int(round(time.time() * 1000))
 
