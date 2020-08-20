@@ -48,9 +48,9 @@ try:
         key = input()
 
         if (key == "" or key == " "): ##输入回车
-            utils.play_sound(Sound['BI'], delay = 0.3)
             # 开始一组K-test
             test_num = utils.Start_single_test(test_num)
+            utils.play_sound(Sound['BI'], delay = 0.3)
             t = Get_time_stamp()
             time.sleep(0.1)     # 100毫秒的延迟，消除干扰
             

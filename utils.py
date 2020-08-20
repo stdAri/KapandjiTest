@@ -57,6 +57,7 @@ def Record_all_test_result(name, number, test_num, success_num, result_list):
     
     return test_num, success_num, result_list
 
+# 若delay不为0则进行一段时间延时后立刻停止
 def play_sound(name, delay = 0):
     sound_dir_path = 'sound/'
     mixer.music.load(sound_dir_path + name)
