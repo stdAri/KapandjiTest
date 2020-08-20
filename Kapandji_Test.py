@@ -2,6 +2,7 @@
 from RPi import GPIO
 import utils
 import time
+from pygame import mixer
 
 ## Variable setting
 # GPIO
@@ -39,7 +40,7 @@ number = input("Input the No. of the test: ")
 
 # GPIO config
 utils.Gpio_config(sensor, switch, sensor_bounce_time, switch_bounce_time)
-
+mixer.init()
  
 #--------------------------------------------  main
 try:
@@ -47,7 +48,6 @@ try:
         key = input()
 
         if (key == "" or key == " "): ##输入回车
-            mixer.init()
             utils.play_sound(Sound['BI'], delay = 0.3)
             # 开始一组K-test
             test_num = utils.Start_single_test(test_num)
