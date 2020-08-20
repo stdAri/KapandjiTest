@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from RPi import GPIO
-import config as cfg
+import utils
 import time
 
 ## Variable setting
@@ -20,8 +20,15 @@ fail_time = 20 # 失败时间阈值
 SUCCESS = 1
 FAILED = 0
 
+# Sound name
+Sound = {'BI' : 'bi.mp3',
+         'FAIL' : 'fail.mp3',
+         'FINISH' : 'finish.mp3',
+         'START' : 'start.mp3',
+         'SUCCESS' : 'success.mp3'}
+
 # 测试者姓
-name = "zhang"
+name = "chen"
 
 # 毫秒级时间戳
 Get_time_stamp = lambda:int(round(time.time() * 1000))
@@ -31,7 +38,7 @@ print("Full test num: ", full_test_num, "\nFail time: ", fail_time)
 number = input("Input the No. of the test: ")
 
 # GPIO config
-cfg.Gpio_config(sensor, switch, sensor_bounce_time, switch_bounce_time)
+utils.Gpio_config(sensor, switch, sensor_bounce_time, switch_bounce_time)
 
  
 #--------------------------------------------  main
@@ -40,8 +47,10 @@ try:
         key = input()
 
         if (key == "" or key == " "): ##输入回车
+            mixer.init()
+            utils.play_sound(Sound['BI'], delay = 0.3)
             # 开始一组K-test
-            test_num = cfg.Start_single_test(test_num)
+            test_num = utils.Start_single_test(test_num)
             t = Get_time_stamp()
             time.sleep(0.1)     # 100毫秒的延迟，消除干扰
             
@@ -50,19 +59,21 @@ try:
 
                 # 大于fail_time认为失败
                 if (delta_t > fail_time):
-                    result_list, success_num = cfg.Record_test_result(FAILED, 0, test_num, success_num, result_list)
+                    result_list, success_num = utils.Record_test_result(FAILED, 0, test_num, success_num, result_list)
+                    utils.play_sound(Sound['FAIL'])
                     break
                 
                 # fail_time内锡纸接触认为成功
                 if (GPIO.event_detected(sensor)):
                     if (GPIO.input(sensor) == GPIO.HIGH):
                         # print(GPIO.input(sensor))
-                        result_list, success_num = cfg.Record_test_result(SUCCESS, delta_t, test_num, success_num, result_list)
+                        result_list, success_num = utils.Record_test_result(SUCCESS, delta_t, test_num, success_num, result_list)
+                        utils.play_sound(Sound['SUCCESS'])
                         break
 
         # 完成所有测试组
         if (not begin_flag and test_num == full_test_num):
-            test_num, success_num, result_list = cfg.Record_all_test_result(name, number, test_num, success_num, result_list)
+            test_num, success_num, result_list = utils.Record_all_test_result(name, number, test_num, success_num, result_list)
             number = input("Input the No. of the test: ")
             continue
                 
@@ -72,6 +83,7 @@ try:
         time.sleep(0.01)     # 10毫秒的检测间隔
 except Exception as e:
     print(e)
+    
  
 # 清理占用的GPIO资源
 GPIO.cleanup()

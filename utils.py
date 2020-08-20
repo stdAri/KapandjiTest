@@ -1,6 +1,8 @@
 from RPi import GPIO
 import time
 import numpy as np
+from pygame import mixer
+
 
 SAVEFILE = 1
 
@@ -54,3 +56,11 @@ def Record_all_test_result(name, number, test_num, success_num, result_list):
     success_num = 0
     
     return test_num, success_num, result_list
+
+def play_sound(name, dealy = 0):
+    sound_dir_path = 'sound/'
+    mixer.music.load(sound_dir_path + name)
+    mixer.play()
+    if (dealy!=0):
+        time.sleep(dealy)
+        mixer.music.stop()
